@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import MapView from './MapView';
 
 const App = () => {
   // Etats pour les adresses et l'itinéraire
@@ -53,6 +54,10 @@ const App = () => {
 
       {/* Bouton pour calculer l'itinéraire */}
       <button onClick={handleSearch}>Calculer l'itinéraire</button>
+
+      <div>
+        <MapView />
+      </div>
 
       {/* Affichage des résultats de l'itinéraire */}
       <div>
