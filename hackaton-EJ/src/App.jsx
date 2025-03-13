@@ -9,11 +9,12 @@ const App = () => {
 
   const handleSearch = async () => {
     try {
-      const fromCoords = await getCurrentLocation();
+      const fromCoords = await getCoordinatesFromAddress(from);
 
       if (fromCoords && to) {
         const routeData = await fetchRoute(fromCoords.lat, fromCoords.lon, to[0], to[1]);
         setRoute(routeData);
+        console.log(route)
       } else {
         console.error('Veuillez définir une adresse de départ et cliquer sur la carte pour choisir la destination.');
       }
