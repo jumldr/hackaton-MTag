@@ -38,7 +38,7 @@ const App = () => {
 
       <button onClick={handleSearch}>Calculer l'itinéraire</button>
 
-      <MapView setTo={setTo} />
+      <MapView setTo={setTo} route={route} />
 
       <div>
         {route ? (
