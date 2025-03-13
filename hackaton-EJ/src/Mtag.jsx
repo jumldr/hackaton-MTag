@@ -1,5 +1,5 @@
-async function fetchRoute(fromLat, fromLon, toLat, toLon) {
-    const url = `https://data.mobilites-m.fr/api/routers/default/plan?fromPlace=${fromLat},${fromLon}&toPlace=${toLat},${toLon}&mode=TRANSIT,WALK`;
+async function fetchRoute(from, to) {
+    const url = `https://data.mobilites-m.fr/api/routers/default/plan?fromPlace=${from[0]},${from[1]}&toPlace=${to[0]},${to[1]}&mode=TRANSIT,WALK`;
 
     try {
       const response = await fetch(url);
