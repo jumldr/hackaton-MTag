@@ -1,17 +1,18 @@
-export async function fetchRoute(fromLat, fromLon, toLat, toLon) {
-    const url = `https://data.mobilites-m.fr/api/routers/default/plan?fromPlace=${fromLat},${fromLon}&toPlace=${toLat},${toLon}&mode=TRANSIT,WALK`;
-  
-    try {
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error(`Erreur HTTP : ${response.status}`);
-      }
-      return await response.json();
-    } catch (error) {
-      console.error('Erreur lors du calcul de l\'itinéraire :', error);
-      return null;
+export async function fetchRoute(fromLat, fromLon, toLat, toLon, mode) {
+  const url = `https://data.mobilites-m.fr/api/routers/default/plan?fromPlace=${fromLat},${fromLon}&toPlace=${toLat},${toLon}&mode=${mode}`;
+
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`Erreur HTTP : ${response.status}`);
     }
+    return await response.json();
+  } catch (error) {
+    console.error("Erreur lors du calcul de l'itinéraire :", error);
+    return null;
+  }
 }
+
 
 export async function getCoordinatesFromAddress(address) {
     const encodedAddress = encodeURIComponent(address);
@@ -22,7 +23,7 @@ export async function getCoordinatesFromAddress(address) {
       const data = await response.json();
   
       if (data.length > 0) {
-        return { lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon) };
+        return { lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon)};
       } else {
         console.error("Aucun résultat trouvé pour cette adresse.");
         return null;
