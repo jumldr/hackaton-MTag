@@ -83,26 +83,78 @@ const App = () => {
 };
 
 const RouteDetails = ({ route, mode }) => {
+
   if (!route || !route.plan || route.plan.itineraries.length === 0) {
     return <p>Aucun itinéraire trouvé.</p>;
   }
 
+  // Trier les itinéraires par durée (du plus court au plus long)
+  const sortedItineraries = [...route.plan.itineraries].sort((a, b) => a.duration - b.duration);
+
+  if (mode === 'WALK') {
+    const itinerary = route.plan.itineraries[0]; // Prendre le premier itinéraire
+    const totalWalkingTime = Math.round(itinerary.duration / 60); // Convertir en minutes
+    return (
+      <div>
+        <h2>Trajet à pied</h2>
+        <p>Temps de marche total : {totalWalkingTime} min</p>
+      </div>
+    );
+  }
+
   return (
     <div>
-      <h2>{mode === 'WALK' ? "Trajet à pied" : "Trajets en transport en commun"}</h2>
-      {route.plan.itineraries.map((itinerary, index) => (
+      <h2>Transport en commun</h2>
+
+      {/* Affichage du trajet le plus rapide */}
+      <div className="itinerary">
+        <h3>Itinéraire le plus rapide - Durée : {Math.round(sortedItineraries[0].duration / 60)} min</h3>
+        <ul>
+          {sortedItineraries[0].legs.map((leg, legIndex) => {
+            if (leg.mode === "WALK") {
+              return (
+                <li key={legIndex}>
+                  🚶‍♂️ Marcher {Math.round(leg.distance)} mètres {legIndex === 0 ? `jusqu'à l'arrêt ${sortedItineraries[0].legs[legIndex + 1]?.from.name || "inconnu"}` : `jusqu'au point d'arrivée`}
+                </li>
+              );
+            } else {
+              return (
+                <li key={legIndex}>
+                  🚌 Prendre <strong>{leg.route}</strong> de <strong>{leg.from.name}</strong> à <strong>{leg.to.name}</strong> ({leg.intermediateStops?.length || 0} arrêt(s))
+                </li>
+              );
+            }
+          })}
+        </ul>
+      </div>
+
+      {/* Bouton pour afficher les autres trajets */}
+      {!showAllRoutes && (
+        <button className="show-more-button" onClick={() => setShowAllRoutes(true)}>
+          Afficher plus d'itinéraires
+        </button>
+      )}
+
+      {/* Affichage des autres trajets si le bouton est cliqué */}
+      {showAllRoutes && sortedItineraries.slice(1).map((itinerary, index) => (
         <div key={index} className="itinerary">
-          <h3>Itinéraire {index + 1} - Durée : {Math.round(itinerary.duration / 60)} min</h3>
+          <h3>Itinéraire {index + 2} - Durée totale : {Math.round(itinerary.duration / 60)} min</h3>
           <ul>
-            {itinerary.legs.map((leg, legIndex) => (
-              <li key={legIndex}>
-                {leg.mode === "WALK" ? (
-                  <>🚶‍♂️ Marcher {Math.round(leg.distance)} mètres</>
-                ) : (
-                  <>🚌 Prendre {leg.route} de {leg.from.name} à {leg.to.name}</>
-                )}
-              </li>
-            ))}
+            {itinerary.legs.map((leg, legIndex) => {
+              if (leg.mode === "WALK") {
+                return (
+                  <li key={legIndex}>
+                    🚶‍♂️ Marcher {Math.round(leg.distance)} mètres {legIndex === 0 ? `jusqu'à l'arrêt ${itinerary.legs[legIndex + 1]?.from.name || "inconnu"}` : `jusqu'au point d'arrivée`}
+                  </li>
+                );
+              } else {
+                return (
+                  <li key={legIndex}>
+                    🚌 Prendre <strong>{leg.route}</strong> de <strong>{leg.from.name}</strong> à <strong>{leg.to.name}</strong> ({leg.intermediateStops?.length || 0} arrêt(s))
+                  </li>
+                );
+              }
+            })}
           </ul>
         </div>
       ))}
