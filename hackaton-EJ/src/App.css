@@ -1,79 +1,105 @@
-.app-container {
-  font-family: Arial, sans-serif;
-  text-align: center;
-  background-color: #f0f8ff;
-  padding: 20px;
+@import "leaflet/dist/leaflet.css";
+
+/* App.css */
+
+body, html {
+  margin: 0;
+  padding: 0;
+  font-family: 'Georgia', serif;
+  background-color: #f6f6f4;
 }
 
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* ====== HEADER ====== */
 .header {
-  background-color: #007bff;
-  color: white;
-  padding: 15px;
-  border-radius: 10px;
-  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  background-color: #e5e1d7;
+  padding: 20px 40px;
+  font-size: 2rem;
+  color: #8a6d52;
+  font-weight: bold;
   position: relative;
 }
 
-.header h1 {
-  margin: 0;
+/* ====== MAIN CONTENT ====== */
+.content-container {
+  display: flex;
+  flex-direction: row;
+  flex-grow: 1;
 }
 
+/* ====== LEFT CONTROLS PANEL ====== */
 .controls {
-  margin-bottom: 20px;
+  width: 50%;
+  padding: 40px;
+  box-sizing: border-box;
+  background-color: white;
+}
+
+.controls h2,
+.controls p,
+.controls label {
+  margin-bottom: 15px;
+  color: #222;
 }
 
 .input-field {
-  padding: 10px;
-  width: 80%;
-  margin-bottom: 10px;
-  border-radius: 5px;
-  border: 1px solid #007bff;
+  width: 90%;
+  padding: 12px;
+  border-radius: 16px;
+  border: none;
+  background-color: #ddd;
+  font-size: 1rem;
+  margin: 20px 0;
 }
 
 .destination-text {
-  font-weight: bold;
-  color: #007bff;
+  margin-bottom: 20px;
+  font-style: italic;
 }
 
 .mode-selector {
-  margin: 10px 0;
+  margin-bottom: 20px;
+}
+
+.mode-selector label {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 0.95rem;
+  color: #444;
 }
 
 .search-button {
-  background-color: #007bff;
+  padding: 10px 20px;
+  background-color: #8a6d52;
   color: white;
   border: none;
-  padding: 10px 20px;
-  border-radius: 5px;
+  border-radius: 10px;
+  font-size: 1rem;
   cursor: pointer;
 }
 
 .search-button:hover {
-  background-color: #0056b3;
+  background-color: #a07d5e;
 }
 
+/* ====== MAP ====== */
 .map-container {
-  width: 300px;
-  height: 300px;
-  border-radius: 50%; /* Forme ronde */
-  overflow: hidden;
-  margin-left: auto; /* Aligne à droite */
-  margin-right: 0; /* Assure que la carte est collée à la droite */
-  border: 3px solid #007bff;
+  width: 50%;
+  border-radius: 25;
+  background-color: #3f3f3f;
   position: relative;
 }
 
+/* ====== ROUTE DETAILS ====== */
 .route-details {
-  margin-top: 20px;
-  padding: 10px;
-  background-color: white;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 255, 0.2);
-}
-
-.content-container {
-  display: flex;
-  justify-content: space-between; /* Pour aligner les éléments à gauche et à droite */
-  align-items: center;
-  padding: 20px;
+  padding: 20px 40px;
+  background-color: #f6f6f4;
+  font-size: 1rem;
 }

@@ -3,7 +3,7 @@ import MapView from './MapView';
 import { fetchRoute, getCoordinatesFromAddress } from './api';
 import './App.css';
 
-const App = () => {
+export default function App() {
   const [from, setFrom] = useState('');
   const [to, setTo] = useState(null);
   const [route, setRoute] = useState(null);
@@ -109,5 +109,3 @@ const RouteDetails = ({ route, mode }) => {
     </div>
   );
 };
-
-export default App;
