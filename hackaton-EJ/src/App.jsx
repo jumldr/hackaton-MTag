@@ -14,6 +14,7 @@ const App = () => {
       const fromCoords = await getCoordinatesFromAddress(from);
       if (fromCoords && to) {
         const routeData = await fetchRoute(fromCoords.lat, fromCoords.lon, to[0], to[1], mode);
+        console.log("Itinéraires récupérés :", routeData.plan.itineraries);
         setRoute(routeData);
       } else {
         console.error('Veuillez définir une adresse de départ et cliquer sur la carte pour choisir la destination.');
@@ -86,12 +87,25 @@ const RouteDetails = ({ route, mode }) => {
     return <p>Aucun itinéraire trouvé.</p>;
   }
 
-  const itinerary = mode === 'WALK' ? route.plan.itineraries[0] : route.plan.itineraries[1] || route.plan.itineraries[0];
-
   return (
     <div>
-      <h2>{mode === 'WALK' ? "Trajet à pied" : "Trajet en transport en commun"}</h2>
-      <p>Durée : {Math.round(itinerary.duration / 60)} min</p>
+      <h2>{mode === 'WALK' ? "Trajet à pied" : "Trajets en transport en commun"}</h2>
+      {route.plan.itineraries.map((itinerary, index) => (
+        <div key={index} className="itinerary">
+          <h3>Itinéraire {index + 1} - Durée : {Math.round(itinerary.duration / 60)} min</h3>
+          <ul>
+            {itinerary.legs.map((leg, legIndex) => (
+              <li key={legIndex}>
+                {leg.mode === "WALK" ? (
+                  <>🚶‍♂️ Marcher {Math.round(leg.distance)} mètres</>
+                ) : (
+                  <>🚌 Prendre {leg.route} de {leg.from.name} à {leg.to.name}</>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
     </div>
   );
 };
