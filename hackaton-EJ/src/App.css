@@ -20,7 +20,7 @@ body, html {
   display: flex;
   align-items: center;
   background-color: #e5e1d7;
-  padding: 20px 40px;
+  padding: 0px 40px;
   font-size: 2rem;
   color: #8a6d52;
   font-weight: bold;
@@ -91,10 +91,10 @@ body, html {
 
 /* ====== MAP ====== */
 .map-container {
-  width: 50%;
-  border-radius: 25;
-  background-color: #3f3f3f;
+  width: 100%;
+  min-height: 50vh;
   position: relative;
+  background-color: #3f3f3f;
 }
 
 /* ====== ROUTE DETAILS ====== */
@@ -102,4 +102,70 @@ body, html {
   padding: 20px 40px;
   background-color: #f6f6f4;
   font-size: 1rem;
+}
+
+/* ====== RESPONSIVE DESIGN ====== */
+
+@media (max-width: 768px) {
+  .header {
+    font-size: 1.5rem;
+    padding: 0 20px;
+  }
+
+  .content-container {
+    flex-direction: column;
+    padding: 20px;
+  }
+
+  .controls {
+    width: 100%;
+    padding: 20px;
+  }
+
+  .map-container {
+    height: 600px;
+  }
+
+  .input-field {
+    width: 100%;
+  }
+
+  .mode-selector {
+    width: 100%;
+  }
+
+  .search-button {
+    width: 100%;
+    padding: 15px;
+    font-size: 1.2rem;
+  }
+
+  .route-details {
+    padding: 20px;
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .header {
+    font-size: 1.2rem;
+  }
+
+  .controls h2 {
+    font-size: 1.2rem;
+  }
+
+  .input-field {
+    font-size: 0.9rem;
+  }
+
+  .search-button {
+    padding: 12px;
+    font-size: 1.1rem;
+  }
+
+  .route-details {
+    padding: 15px;
+    font-size: 0.9rem;
+  }
 }

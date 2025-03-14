@@ -31,24 +31,28 @@ const MapView = ({ setTo, route, className }) => {
   }
 
   return (
-    <MapContainer center={markerPosition} zoom={13} className={className}>
-      <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+    <div className={className}>
+      <MapContainer
+        center={markerPosition}
+        zoom={13}
+        style={{ height: '100%', width: '100%' }}
+      >
+        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
-      {/* Marqueur de destination */}
-      <Marker position={markerPosition}>
-        <Popup>
-          Destination : <br />
-          Latitude: {markerPosition[0]} <br />
-          Longitude: {markerPosition[1]}
-        </Popup>
-      </Marker>
+        <Marker position={markerPosition}>
+          <Popup>
+            Destination : <br />
+            Latitude: {markerPosition[0]} <br />
+            Longitude: {markerPosition[1]}
+          </Popup>
+        </Marker>
 
-      {/* Affichage de l'itinéraire si disponible */}
-      {polylineCoords.length > 0 && <Polyline positions={polylineCoords} color="blue" />}
+        {polylineCoords.length > 0 && <Polyline positions={polylineCoords} color="blue" />}
 
-      <MyMapEvent />
-    </MapContainer>
+        <MyMapEvent />
+      </MapContainer>
+    </div>
   );
-};
+}
 
 export default MapView;
