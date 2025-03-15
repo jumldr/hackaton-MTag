@@ -4,22 +4,23 @@ import React, { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMapEvent, Polyline } from 'react-leaflet';
 import polyline from '@mapbox/polyline';
 
-const MapView = ({ setTo, route, className }) => {
+const MapView = ({ setTo, route, className, selectedItineraryIndex }) => {
   const [markerPosition, setMarkerPosition] = useState([45.1885, 5.7245]);
   const [polylineCoords, setPolylineCoords] = useState([]);
 
   useEffect(() => {
     if (route && route.plan && route.plan.itineraries.length > 0) {
-      const coordinates = route.plan.itineraries[0].legs.flatMap(leg => {
-        if (leg.legGeometry && leg.legGeometry.points) {
-          return polyline.decode(leg.legGeometry.points); // Décode la chaîne en un tableau de lat/lon
-        }
-        return [];
-      });
-
-      setPolylineCoords(coordinates);
+      const selectedItinerary = route.plan.itineraries[selectedItineraryIndex];
+      if (selectedItinerary) {
+        const coordinates = selectedItinerary.legs.flatMap(leg => {
+          return leg.legGeometry ? polyline.decode(leg.legGeometry.points) : [];
+        });
+  
+        setPolylineCoords(coordinates);
+      }
     }
-  }, [route]);
+  }, [route, selectedItineraryIndex]);
+  
 
   function MyMapEvent() {
     useMapEvent('click', (event) => {

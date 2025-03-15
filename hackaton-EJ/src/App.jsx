@@ -8,6 +8,8 @@ export default function App() {
   const [to, setTo] = useState(null);
   const [route, setRoute] = useState(null);
   const [mode, setMode] = useState('WALK');
+  const [selectedItineraryIndex, setSelectedItineraryIndex] = useState(0);
+
 
   const handleSearch = async () => {
     try {
@@ -16,6 +18,7 @@ export default function App() {
         const routeData = await fetchRoute(fromCoords.lat, fromCoords.lon, to[0], to[1], mode);
         console.log("Itinéraires récupérés :", routeData.plan.itineraries);
         setRoute(routeData);
+        setSelectedItineraryIndex(0);
       } else {
         console.error('Veuillez définir une adresse de départ et cliquer sur la carte pour choisir la destination.');
       }
@@ -39,10 +42,6 @@ export default function App() {
             onChange={(e) => setFrom(e.target.value)}
             className="input-field"
           />
-
-          <p className="destination-text">
-            Destination : {to ? `Lat: ${to[0]}, Lon: ${to[1]}` : "Cliquez sur la carte pour choisir la destination"}
-          </p>
 
           <div className="mode-selector">
             <label>
@@ -68,12 +67,22 @@ export default function App() {
           <button className="search-button" onClick={handleSearch}>Calculer l'itinéraire</button>
         </div>
 
-        <MapView setTo={setTo} route={route} className="map-container" />
+        <MapView 
+          setTo={setTo} 
+          route={route} 
+          selectedItineraryIndex={selectedItineraryIndex} 
+          className="map-container" 
+        />
       </div>
 
       <div className="route-details">
         {route ? (
-          <RouteDetails route={route} mode={mode} />
+          <RouteDetails 
+            route={route} 
+            mode={mode} 
+            selectedItineraryIndex={selectedItineraryIndex} 
+            setSelectedItineraryIndex={setSelectedItineraryIndex} 
+          />
         ) : (
           <p>Aucun itinéraire trouvé.</p>
         )}
@@ -82,84 +91,44 @@ export default function App() {
   );
 };
 
-const RouteDetails = ({ route, mode }) => {
+const RouteDetails = ({ route, mode, selectedItineraryIndex, setSelectedItineraryIndex }) => {
+  const [showAllRoutes, setShowAllRoutes] = useState(false);
 
   if (!route || !route.plan || route.plan.itineraries.length === 0) {
     return <p>Aucun itinéraire trouvé.</p>;
   }
 
-  // Trier les itinéraires par durée (du plus court au plus long)
   const sortedItineraries = [...route.plan.itineraries].sort((a, b) => a.duration - b.duration);
-
-  if (mode === 'WALK') {
-    const itinerary = route.plan.itineraries[0]; // Prendre le premier itinéraire
-    const totalWalkingTime = Math.round(itinerary.duration / 60); // Convertir en minutes
-    return (
-      <div>
-        <h2>Trajet à pied</h2>
-        <p>Temps de marche total : {totalWalkingTime} min</p>
-      </div>
-    );
-  }
 
   return (
     <div>
-      <h2>Transport en commun</h2>
+      <h2>{mode === "WALK" ? "Trajet à pied" : "Transport en commun"}</h2>
 
-      {/* Affichage du trajet le plus rapide */}
-      <div className="itinerary">
-        <h3>Itinéraire le plus rapide - Durée : {Math.round(sortedItineraries[0].duration / 60)} min</h3>
-        <ul>
-          {sortedItineraries[0].legs.map((leg, legIndex) => {
-            if (leg.mode === "WALK") {
-              return (
-                <li key={legIndex}>
-                  🚶‍♂️ Marcher {Math.round(leg.distance)} mètres {legIndex === 0 ? `jusqu'à l'arrêt ${sortedItineraries[0].legs[legIndex + 1]?.from.name || "inconnu"}` : `jusqu'au point d'arrivée`}
-                </li>
-              );
-            } else {
-              return (
-                <li key={legIndex}>
-                  🚌 Prendre <strong>{leg.route}</strong> de <strong>{leg.from.name}</strong> à <strong>{leg.to.name}</strong> ({leg.intermediateStops?.length || 0} arrêt(s))
-                </li>
-              );
-            }
-          })}
-        </ul>
-      </div>
-
-      {/* Bouton pour afficher les autres trajets */}
-      {!showAllRoutes && (
-        <button className="show-more-button" onClick={() => setShowAllRoutes(true)}>
-          Afficher plus d'itinéraires
-        </button>
-      )}
-
-      {/* Affichage des autres trajets si le bouton est cliqué */}
-      {showAllRoutes && sortedItineraries.slice(1).map((itinerary, index) => (
+      {sortedItineraries.map((itinerary, index) => (
         <div key={index} className="itinerary">
-          <h3>Itinéraire {index + 2} - Durée totale : {Math.round(itinerary.duration / 60)} min</h3>
+          <h3>
+            Itinéraire {index + 1} - Durée : {Math.round(itinerary.duration / 60)} min
+            {selectedItineraryIndex === index && " ✅ (Sélectionné)"}
+          </h3>
           <ul>
-            {itinerary.legs.map((leg, legIndex) => {
-              if (leg.mode === "WALK") {
-                return (
-                  <li key={legIndex}>
-                    🚶‍♂️ Marcher {Math.round(leg.distance)} mètres {legIndex === 0 ? `jusqu'à l'arrêt ${itinerary.legs[legIndex + 1]?.from.name || "inconnu"}` : `jusqu'au point d'arrivée`}
-                  </li>
-                );
-              } else {
-                return (
-                  <li key={legIndex}>
-                    🚌 Prendre <strong>{leg.route}</strong> de <strong>{leg.from.name}</strong> à <strong>{leg.to.name}</strong> ({leg.intermediateStops?.length || 0} arrêt(s))
-                  </li>
-                );
-              }
-            })}
+            {itinerary.legs.map((leg, legIndex) => (
+              <li key={legIndex}>
+                {leg.mode === "WALK" ? (
+                  `🚶‍♂️ Marcher ${Math.round(leg.distance)} mètres`
+                ) : (
+                  `🚌 Prendre ${leg.route} de ${leg.from.name} à ${leg.to.name}`
+                )}
+              </li>
+            ))}
           </ul>
+
+          {selectedItineraryIndex !== index && (
+            <button onClick={() => setSelectedItineraryIndex(index)}>
+              Sélectionner cet itinéraire
+            </button>
+          )}
         </div>
       ))}
     </div>
   );
 };
-
-export default App;
