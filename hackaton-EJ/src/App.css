@@ -57,14 +57,19 @@ body, html {
   background-color: #ddd;
   font-size: 1rem;
   margin: 20px 0;
+  margin-top: 20px;
 }
 
 .destination-text {
   margin-bottom: 20px;
+  margin-top: -10px;
+  display: block;
   font-style: italic;
+  color: #444;
 }
 
 .mode-selector {
+  margin-top: 20px;
   margin-bottom: 20px;
 }
 
@@ -75,7 +80,7 @@ body, html {
   color: #444;
 }
 
-.search-button {
+.all-button {
   padding: 10px 20px;
   background-color: #8a6d52;
   color: white;
@@ -83,6 +88,7 @@ body, html {
   border-radius: 10px;
   font-size: 1rem;
   cursor: pointer;
+  margin-top: 20px;
 }
 
 .search-button:hover {

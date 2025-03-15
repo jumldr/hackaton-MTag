@@ -3,13 +3,21 @@ import MapView from './MapView';
 import { fetchRoute, getCoordinatesFromAddress } from './api';
 import './App.css';
 
+const getTransportIcon = (routeType) => {
+  switch (routeType) {
+    case 0: return "🚋 Tram";
+    case 3: return "🚌 Bus";
+    default: return "🚍 Transport"; 
+  }
+};
+
 export default function App() {
   const [from, setFrom] = useState('');
   const [to, setTo] = useState(null);
   const [route, setRoute] = useState(null);
   const [mode, setMode] = useState('WALK');
   const [selectedItineraryIndex, setSelectedItineraryIndex] = useState(0);
-
+  const [searchPerformed, setSearchPerformed] = useState(false);
 
   const handleSearch = async () => {
     try {
@@ -22,8 +30,10 @@ export default function App() {
       } else {
         console.error('Veuillez définir une adresse de départ et cliquer sur la carte pour choisir la destination.');
       }
+      setSearchPerformed(true);
     } catch (error) {
       console.error("Erreur lors de la recherche de l'itinéraire :", error);
+      setSearchPerformed(true);
     }
   };
 
@@ -42,6 +52,10 @@ export default function App() {
             onChange={(e) => setFrom(e.target.value)}
             className="input-field"
           />
+
+          <div >
+            <p className="destination-text"> Cliquez sur la carte pour définir l'adresse d'arrivée</p>
+          </div>
 
           <div className="mode-selector">
             <label>
@@ -64,7 +78,7 @@ export default function App() {
             </label>
           </div>
 
-          <button className="search-button" onClick={handleSearch}>Calculer l'itinéraire</button>
+          <button className="all-button" onClick={handleSearch}>Calculer l'itinéraire</button>
         </div>
 
         <MapView 
@@ -84,7 +98,7 @@ export default function App() {
             setSelectedItineraryIndex={setSelectedItineraryIndex} 
           />
         ) : (
-          <p>Aucun itinéraire trouvé.</p>
+          searchPerformed && <p>Aucun itinéraire trouvé.</p>
         )}
       </div>
     </div>
@@ -104,31 +118,80 @@ const RouteDetails = ({ route, mode, selectedItineraryIndex, setSelectedItinerar
     <div>
       <h2>{mode === "WALK" ? "Trajet à pied" : "Transport en commun"}</h2>
 
-      {sortedItineraries.map((itinerary, index) => (
-        <div key={index} className="itinerary">
-          <h3>
-            Itinéraire {index + 1} - Durée : {Math.round(itinerary.duration / 60)} min
-            {selectedItineraryIndex === index && " ✅ (Sélectionné)"}
-          </h3>
-          <ul>
-            {itinerary.legs.map((leg, legIndex) => (
-              <li key={legIndex}>
-                {leg.mode === "WALK" ? (
-                  `🚶‍♂️ Marcher ${Math.round(leg.distance)} mètres`
-                ) : (
-                  `🚌 Prendre ${leg.route} de ${leg.from.name} à ${leg.to.name}`
-                )}
-              </li>
-            ))}
-          </ul>
+      {/* Affichage du premier itinéraire uniquement au début */}
+      <div>
+        <h3>
+          Itinéraire 1 - Durée : {Math.round(sortedItineraries[0].duration / 60)} min
+          {selectedItineraryIndex === 0 && " ✅ (Sélectionné)"}
+        </h3>
+        <div>
+          {sortedItineraries[0].legs.map((leg, legIndex) => (
+            <div key={legIndex} style={{ marginBottom: "10px" }}>
+              {leg.mode === "WALK" ? (
+                <p>🚶‍♂️ Marcher {Math.round(leg.distance)} mètres jusqu'à <strong>{leg.to.name.replace(/^.*, /, '')}</strong></p>
+              ) : (
+                <>
+                  <p>
+                    {getTransportIcon(leg.routeType)} <strong>{leg.routeShortName || leg.route}</strong> {" "}
+                    de <strong>{leg.from.name.replace(/^.*, /, '')}</strong> à <strong>{leg.to.name.replace(/^.*, /, '')}</strong>
+                  </p>
+                  {leg.intermediateStops && leg.intermediateStops.length > 0 && (
+                    <p>🔹 Arrêts intermédiaires : {leg.intermediateStops.map(stop => stop.name.replace(/^.*, /, '')).join(" ➝ ")}</p>
+                  )}
+                </>
+              )}
+            </div>
+          ))}
+        </div>
 
-          {selectedItineraryIndex !== index && (
-            <button onClick={() => setSelectedItineraryIndex(index)}>
+        {selectedItineraryIndex !== 0 && (
+          <button className="all-button" onClick={() => setSelectedItineraryIndex(0)}>
+            Sélectionner cet itinéraire
+          </button>
+        )}
+      </div>
+
+      {/* Affichage des autres itinéraires si "showAllRoutes" est vrai */}
+      {showAllRoutes && sortedItineraries.slice(1).map((itinerary, index) => (
+        <div key={index + 1} className="itinerary">
+          <h3>
+            Itinéraire {index + 2} - Durée : {Math.round(itinerary.duration / 60)} min
+            {selectedItineraryIndex === index + 1 && " ✅ (Sélectionné)"}
+          </h3>
+          <div>
+            {itinerary.legs.map((leg, legIndex) => (
+              <div key={legIndex} style={{ marginBottom: "10px" }}>
+                {leg.mode === "WALK" ? (
+                  <p>🚶‍♂️ Marcher {Math.round(leg.distance)} mètres jusqu'à <strong>{leg.to.name.replace(/^.*, /, '')}</strong></p>
+                ) : (
+                  <>
+                    <p>
+                      {getTransportIcon(leg.routeType)} <strong>{leg.routeShortName || leg.route}</strong> {" "}
+                      de <strong>{leg.from.name.replace(/^.*, /, '')}</strong> à <strong>{leg.to.name.replace(/^.*, /, '')}</strong>
+                    </p>
+                    {leg.intermediateStops && leg.intermediateStops.length > 0 && (
+                      <p>🔹 Arrêts intermédiaires : {leg.intermediateStops.map(stop => stop.name.replace(/^.*, /, '')).join(" ➝ ")}</p>
+                    )}
+                  </>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {selectedItineraryIndex !== index + 1 && (
+            <button className="all-button" onClick={() => setSelectedItineraryIndex(index + 1)}>
               Sélectionner cet itinéraire
             </button>
           )}
         </div>
       ))}
+
+      {/* Bouton pour afficher ou masquer les autres itinéraires */}
+      {!showAllRoutes && sortedItineraries.length > 1 && (
+        <button className="all-button" onClick={() => setShowAllRoutes(true)}>
+          Afficher d'autres itinéraires
+        </button>
+      )}
     </div>
   );
 };
